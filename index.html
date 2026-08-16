@@ -2170,10 +2170,11 @@ src="https://www.facebook.com/tr?id=1373774121618525&ev=PageView&noscript=1"
 </div>
 
 <!--
-TikTok Contact tracking is enabled:
+TikTok + Meta Contact tracking is enabled:
 1) Every direct WhatsApp link is captured by the delegated click listener.
 2) Contact form and cart checkout are captured by openWhatsApp().
-3) Pixel ID: D9F0NV3C77UE4ULOM4CG
+3) TikTok Pixel ID: D9F0NV3C77UE4ULOM4CG
+4) Meta Pixel ID: 1373774121618525
 -->
 <script>
     const WHATSAPP_NUMBER = "972568753111";
@@ -2208,6 +2209,17 @@ TikTok Contact tracking is enabled:
       }
     }
 
+    // Meta Contact: يسجل حدث Contact عند تواصل الزائر عبر واتساب.
+    function trackMetaContact(parameters = {}) {
+      try {
+        if (typeof window.fbq === "function") {
+          window.fbq('track', 'Contact', parameters);
+        }
+      } catch (error) {
+        console.warn('Meta Contact tracking error:', error);
+      }
+    }
+
     function getProductData(card) {
       if (!card) {
         return {
@@ -2235,7 +2247,9 @@ TikTok Contact tracking is enabled:
       if (!whatsappLink) return;
 
       const card = whatsappLink.closest(".product-card");
-      trackTikTokEvent("Contact", getProductData(card));
+      const trackingData = getProductData(card);
+      trackTikTokEvent("Contact", trackingData);
+      trackMetaContact(trackingData);
     });
 
     // ViewContent: يسجل عند ضغط الزائر على صورة المنتج أو اسمه.
@@ -2523,6 +2537,7 @@ TikTok Contact tracking is enabled:
 
     function openWhatsApp(message, trackingData = {}) {
       trackTikTokEvent("Contact", trackingData);
+      trackMetaContact(trackingData);
 
       const url =
         `https://wa.me/${WHATSAPP_NUMBER}` +
